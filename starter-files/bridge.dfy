@@ -95,16 +95,22 @@ module Bridge {
 	
 	method Tick(next:Next_Car, s:state) returns (s':state)
 		requires Valid(s)
-		//requires (              )
+		//requires (s.LightA!=Green || s.LightB!=Green)
+		//requires (  s.W_B>=0 && s.W_A>=0   )
+		requires (s.W_B>0) || (     (s.W_B==0) && (    (next==B) || (next==Both)    ||  ( s.Cross_Counter < 5 )       )              )
+		requires (    s.W_B>0     ) ||    (   (s.W_B==0 )   &&(   (next==B) ||   (s.W_A>0) ||   (next==Both)  ) )
+		requires (    s.W_A>0     ) ||    (   (s.W_A==0 )   &&(   (next==A) || (next==Both) || (s.W_B>0)   ) )
 		ensures Valid(s')
 	{
 		s' := s;
+		
 		match next {
 			case A => s' := Increment_W_A(s');
 			case B => s' := Increment_W_B(s');
 			case Both => s' := Increment_W_A(s'); s' := Increment_W_B(s');
 			case Neither => s' := s';
 		}
+		
 
 		if ((s'.W_A == 0) || (s'.W_B == 0)) && !(s'.W_A == 0 && s'.W_B == 0) {
 			// Simple case
