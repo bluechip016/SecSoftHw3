@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\main.cs">
+        <Link>main.cs</Link>
+      </Compile>
+      <Compile Include="..\parser\MiniCBaseVisitor.cs">
+        <Link>MiniCBaseVisitor.cs</Link>
+      </Compile>
+      <Compile Include="..\parser\MiniCLexer.cs">
+        <Link>MiniCLexer.cs</Link>
+      </Compile>
+      <Compile Include="..\parser\MiniCParser.cs">
+        <Link>MiniCParser.cs</Link>
+      </Compile>
+      <Compile Include="..\parser\MiniCVisitor.cs">
+        <Link>MiniCVisitor.cs</Link>
+      </Compile>
+    </ItemGroup>
+
+</Project>
