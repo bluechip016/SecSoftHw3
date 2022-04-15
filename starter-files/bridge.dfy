@@ -17,8 +17,23 @@ module Bridge {
 
 	predicate method Valid(s:state) {
 		// WRITE a specification here based on the problem definition in the handout
-		if(   (s.LightA==Green && s.LightB==Green) ||   ( s.W_A < 0  )   || (s.W_B < 0)  || ( s.Cross_Counter < 0)  )then false else true
+		// match s
+		//case State(Green,Green,_,_,_) => false
+		//case State(Red,_,_,_,_)=>true
+		//case State(_,Red,_,_,_)=>true
+		//if(s.LightA==Green && s.LightB==Green) then false else true
+		//case State(_,_,0,0,0)=>false
+		
+		// case State(Red,Red,0,0,_) => true
+		// case State(Green,Green,_,_,_) => false
 
+		//case State(Red,_,_,_,_)=>true
+		//case State(_,Red,_,_,_)=>true
+		if(s.LightA==Green && s.LightB==Green) then false else true
+		// case State(_,_,0,0,0)=>false
+		// case State(_,_,_,_,_)=>false
+		//if((s.W_A>=1 && s.W_B == 0) && s.LightA == Green) || ((s.W_B>=1 && s.W_A == 0) && s.LightB == Green) ||
+		//  (s.LightA==Green && s.LightB==Green) then true else false
 	}
 
 	////////////////////////////////////////////////////////
@@ -27,6 +42,7 @@ module Bridge {
 	////////////////////////////////////////////////////////
 	method Init() returns (s:state)
     ensures Valid(s)
+	ensures (s.LightA==Red && s.LightB==Red && s.W_A==0 && s.W_B==0 && s.Cross_Counter==0)
 	{
 		s := State(Red, Red, 0, 0, 0);
 	}
@@ -61,8 +77,6 @@ module Bridge {
 	
 	method Cross(s:state) returns (s':state)
     requires Valid(s)
-	requires  (  (  (s.W_A>0 ) &&(s.W_B>0) ) ||  (  (s.W_B==0)&&(s.LightA==Green)&&(s.W_A>0) ) || (    (s.W_A==0)&&(s.LightA!=Green)&&(s.W_B>0)      )  ) 
-	//requires  (s.LightB==Green)&&(s.W_B > 0)     
     ensures Valid(s')
 	{
 		s' := s;
@@ -77,7 +91,8 @@ module Bridge {
 
 	method Switch_Lights(s:state) returns (s':state)
     requires Valid(s)
-	requires (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
+	requires !((s.LightA==Red)&&(s.LightB==Red))
+	requires !((s.LightA==Green)&&(s.LightB==Green))
     ensures Valid(s')
 	{
 		s' := s;
@@ -95,7 +110,6 @@ module Bridge {
 	
 	method Tick(next:Next_Car, s:state) returns (s':state)
 		requires Valid(s)
-		//requires (              )
 		ensures Valid(s')
 	{
 		s' := s;
