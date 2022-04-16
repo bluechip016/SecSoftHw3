@@ -27,26 +27,33 @@ module Bridge {
 	////////////////////////////////////////////////////////
 	method Init() returns (s:state)
     ensures Valid(s)
+	ensures s.LightA==Red && s.LightB==Red && s.W_A==0 && s.W_B==0 && s.Cross_Counter==0
 	{
 		s := State(Red, Red, 0, 0, 0);
 	}
 
 	method Increment_W_A(s:state) returns (s':state)
     requires Valid(s)
-	requires(s.W_A>=0 && s.W_B>=0)
+	requires(s.W_A>=0 && s.W_B>=0 && s.Cross_Counter>=0)
     ensures Valid(s')
 	ensures (s'.W_A==s.W_A+1)
+	ensures s'.W_A>0
 	ensures (s'.W_B==s.W_B)
+	ensures s'.Cross_Counter==s.Cross_Counter
+	ensures s'.LightA==s.LightA && s'.LightB==s.LightB
 	{
 		s' := s.(W_A := s.W_A + 1);
 	}
 
 	method Increment_W_B(s:state) returns (s':state)
     requires Valid(s)
-	requires(s.W_A>=0 && s.W_B>=0)
+	requires(s.W_A>=0 && s.W_B>=0 && s.Cross_Counter>=0)
     ensures Valid(s')
 	ensures (s'.W_A==s.W_A)
 	ensures (s'.W_B==s.W_B+1)
+	ensures s'.W_B>0
+	ensures s'.Cross_Counter==s.Cross_Counter
+	ensures s'.LightA==s.LightA && s'.LightB==s.LightB
 	{
 		s' := s.(W_B := s.W_B + 1);
 	}
@@ -56,6 +63,8 @@ module Bridge {
 	requires(s.W_A>=0 && s.W_B>=0)
     ensures Valid(s')
 	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B && s'.Cross_Counter==s.Cross_Counter+1)
+	ensures(s'.LightA==s.LightA)
+	ensures s'.LightB==s.LightB
 	{
 		s' := s.(Cross_Counter := s.Cross_Counter + 1);
 	}
@@ -65,6 +74,8 @@ module Bridge {
 	requires    (s.W_A>=0&&s.W_B>=0)  
     ensures Valid(s')
 	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B && s'.Cross_Counter==0)
+	ensures(s'.LightA==s.LightA)
+	ensures s'.LightB==s.LightB
 	{
 		s' := s.(Cross_Counter := 0);
 	}
@@ -75,6 +86,8 @@ module Bridge {
 	//requires  (s.LightB==Green)&&(s.W_B > 0)     
     ensures Valid(s')
 	ensures (s'.W_A>=0 &&s'.W_B>=0)
+	ensures s'.Cross_Counter==s.Cross_Counter+1
+	ensures (s'.LightA==Green && s'.W_A==s.W_A-1 && s'.W_B==s.W_B &&s'.LightB==Red) || (s'.LightA==Red && s'.W_A==s.W_A && s'.W_B==s.W_B-1 )
 	{
 		s' := s;
 		if s.LightA.Green? {
@@ -92,7 +105,8 @@ module Bridge {
 	requires (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
     ensures Valid(s')
 	ensures  (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
-	ensures( s'.W_A==s.W_A && s'.W_B==s.W_B)
+	ensures( s'.W_A==s.W_A && s'.W_B==s.W_B && s'.Cross_Counter==s.Cross_Counter)
+	ensures s'.LightA==s.LightB &&s'.LightB==s.LightA
 	{
 		s' := s;
 		if s'.LightA.Red? {
