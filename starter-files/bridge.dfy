@@ -55,7 +55,7 @@ module Bridge {
     requires Valid(s)
 	requires(s.W_A>=0 && s.W_B>=0)
     ensures Valid(s')
-	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B)
+	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B && s'.Cross_Counter==s.Cross_Counter+1)
 	{
 		s' := s.(Cross_Counter := s.Cross_Counter + 1);
 	}
@@ -64,7 +64,7 @@ module Bridge {
     requires Valid(s)
 	requires    (s.W_A>=0&&s.W_B>=0)  
     ensures Valid(s')
-	ensures(   s'.W_A==s.W_A && s'.W_B==s.W_B  )
+	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B && s'.Cross_Counter==0)
 	{
 		s' := s.(Cross_Counter := 0);
 	}
