@@ -17,23 +17,8 @@ module Bridge {
 
 	predicate method Valid(s:state) {
 		// WRITE a specification here based on the problem definition in the handout
-		// match s
-		//case State(Green,Green,_,_,_) => false
-		//case State(Red,_,_,_,_)=>true
-		//case State(_,Red,_,_,_)=>true
-		//if(s.LightA==Green && s.LightB==Green) then false else true
-		//case State(_,_,0,0,0)=>false
-		
-		// case State(Red,Red,0,0,_) => true
-		// case State(Green,Green,_,_,_) => false
+		if(   (s.LightA==Green && s.LightB==Green) ||   ( s.W_A < 0  )   || (s.W_B < 0)  || ( s.Cross_Counter < 0)  )then false else true
 
-		//case State(Red,_,_,_,_)=>true
-		//case State(_,Red,_,_,_)=>true
-		if(s.LightA==Green && s.LightB==Green) then false else true
-		// case State(_,_,0,0,0)=>false
-		// case State(_,_,_,_,_)=>false
-		//if((s.W_A>=1 && s.W_B == 0) && s.LightA == Green) || ((s.W_B>=1 && s.W_A == 0) && s.LightB == Green) ||
-		//  (s.LightA==Green && s.LightB==Green) then true else false
 	}
 
 	////////////////////////////////////////////////////////
@@ -42,42 +27,54 @@ module Bridge {
 	////////////////////////////////////////////////////////
 	method Init() returns (s:state)
     ensures Valid(s)
-	ensures (s.LightA==Red && s.LightB==Red && s.W_A==0 && s.W_B==0 && s.Cross_Counter==0)
 	{
 		s := State(Red, Red, 0, 0, 0);
 	}
 
 	method Increment_W_A(s:state) returns (s':state)
     requires Valid(s)
+	requires(s.W_A>=0 && s.W_B>=0)
     ensures Valid(s')
+	ensures (s'.W_A==s.W_A+1)
+	ensures (s'.W_B==s.W_B)
 	{
 		s' := s.(W_A := s.W_A + 1);
 	}
 
 	method Increment_W_B(s:state) returns (s':state)
     requires Valid(s)
+	requires(s.W_A>=0 && s.W_B>=0)
     ensures Valid(s')
+	ensures (s'.W_A==s.W_A)
+	ensures (s'.W_B==s.W_B+1)
 	{
 		s' := s.(W_B := s.W_B + 1);
 	}
 
 	method Increment_Cross_Counter(s:state) returns (s':state)
     requires Valid(s)
+	requires(s.W_A>=0 && s.W_B>=0)
     ensures Valid(s')
+	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B)
 	{
 		s' := s.(Cross_Counter := s.Cross_Counter + 1);
 	}
 
 	method Reset_Cross_Counter(s:state) returns (s':state)
     requires Valid(s)
+	requires    (s.W_A>=0&&s.W_B>=0)  
     ensures Valid(s')
+	ensures(   s'.W_A==s.W_A && s'.W_B==s.W_B  )
 	{
 		s' := s.(Cross_Counter := 0);
 	}
 	
 	method Cross(s:state) returns (s':state)
     requires Valid(s)
+	requires  (  (  (s.W_A>0 ) &&(s.W_B>0) ) ||  (  (s.W_B==0)&&(s.LightA==Green)&&(s.W_A>0) ) || (    (s.W_A==0)&&(s.LightA!=Green)&&(s.W_B>0)      )  ) 
+	//requires  (s.LightB==Green)&&(s.W_B > 0)     
     ensures Valid(s')
+	ensures (s'.W_A>=0 &&s'.W_B>=0)
 	{
 		s' := s;
 		if s.LightA.Green? {
@@ -91,9 +88,11 @@ module Bridge {
 
 	method Switch_Lights(s:state) returns (s':state)
     requires Valid(s)
-	requires !((s.LightA==Red)&&(s.LightB==Red))
-	requires !((s.LightA==Green)&&(s.LightB==Green))
+	requires(s.W_A >= 0 && s.W_B >=0)
+	requires (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
     ensures Valid(s')
+	ensures  (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
+	ensures( s'.W_A==s.W_A && s'.W_B==s.W_B)
 	{
 		s' := s;
 		if s'.LightA.Red? {
@@ -112,9 +111,10 @@ module Bridge {
 		requires Valid(s)
 		//requires (s.LightA!=Green || s.LightB!=Green)
 		//requires (  s.W_B>=0 && s.W_A>=0   )
-		requires (s.W_B>0) || (     (s.W_B==0) && (    (next==B) || (next==Both)    ||  ( s.Cross_Counter < 5 )       )              )
-		requires (    s.W_B>0     ) ||    (   (s.W_B==0 )   &&(   (next==B) ||   (s.W_A>0) ||   (next==Both)  ) )
-		requires (    s.W_A>0     ) ||    (   (s.W_A==0 )   &&(   (next==A) || (next==Both) || (s.W_B>0)   ) )
+		//requires (s.LightA!=Green)
+		//requires (s.W_B>0) || (     (s.W_B==0) && (    (next==B) || (next==Both)    ||  ( s.Cross_Counter < 5 )       )              )
+		//requires (    s.W_B>0     ) ||    (   (s.W_B==0 )   &&(   (next==B) ||   (s.W_A>0) ||   (next==Both) ||    (next==A)       ) )
+		//requires (    s.W_A>0     ) ||    (   (s.W_A==0 )   &&(   (next==A) || (next==Both) || (s.W_B>0) || (next==B)  ) )
 		ensures Valid(s')
 	{
 		s' := s;
@@ -125,6 +125,7 @@ module Bridge {
 			case Both => s' := Increment_W_A(s'); s' := Increment_W_B(s');
 			case Neither => s' := s';
 		}
+		
 		
 
 		if ((s'.W_A == 0) || (s'.W_B == 0)) && !(s'.W_A == 0 && s'.W_B == 0) {
