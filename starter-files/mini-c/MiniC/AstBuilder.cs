@@ -18,14 +18,14 @@ namespace _module
 
     public override object VisitDecl(MiniCParser.DeclContext context) {
       var t_str = context.t.GetText();
-      var type = t_str == "bool" ? Type.create_TBool() : Type.create_TInt();
+      Type type = t_str == "bool" ? new Type_TBool() : new Type_TInt();
       var var = MakeVariable(context.v);
       var type_pair = new Dafny.Pair<Variable, Type>(var, type);
       var type_list = new List<Dafny.Pair<Variable, Type>>() {type_pair};
 
       var sec_type_list = new List<Dafny.Pair<Variable, SecType>>();
       if (context.s != null) {
-        var sec_type = context.s.GetText() == "Low" ? SecType.create_Low() : SecType.create_High();
+        SecType sec_type = context.s.GetText() == "Low" ? new SecType_Low() : new SecType_High();
         sec_type_list.Add(new Dafny.Pair<Variable, SecType>(var, sec_type));
       }
       return (type_list, sec_type_list);
@@ -43,7 +43,7 @@ namespace _module
     }
 
     private Variable MakeVariable(MiniCParser.IdContext id) {
-      return Variable.create(Sequence<char>.FromString(id.name.Text));
+      return new Variable(Sequence<char>.FromString(id.name.Text));
     }
     
     public override object VisitExp(MiniCParser.ExpContext context) {
@@ -62,17 +62,17 @@ namespace _module
       } else if (context.op != null) {
         Op o = null;
         if (context.op.Text == "+") {
-          o = Op.create_Plus();
+          o = new Op_Plus();
         } else if (context.op.Text == "-") {
-          o = Op.create_Sub();
+          o = new Op_Sub();
         } else if (context.op.Text == "*") {
-          o = Op.create_Times();
+          o = new Op_Times();
         } else if (context.op.Text == "<=") {
-          o = Op.create_Leq();
+          o = new Op_Leq();
         } else if (context.op.Text == "==") {
-          o = Op.create_Eq();
+          o = new Op_Eq();
         }
-        return Expr.create_BinaryOp(o, (Expr)VisitExp(context.left), (Expr)VisitExp(context.right));
+        return new Expr_BinaryOp(o, (Expr)VisitExp(context.left), (Expr)VisitExp(context.right));
       }
       
       // Unreachable

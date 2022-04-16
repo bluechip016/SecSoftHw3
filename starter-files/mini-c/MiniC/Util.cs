@@ -10,7 +10,7 @@ namespace _module
 {
   public partial class __default
   {
-    public static void ParseFileNormal(ISequence<char> filename, out Dafny.IMap<Variable, Type> decls, out Command ast) {
+    public static void ParseFileNormal(ISequence<char> filename, out Dafny.IMap<_IVariable, _IType> decls, out _ICommand ast) {
       string text = System.IO.File.ReadAllText(Dafny.Helpers.ToString(filename));
       var inputStream = new AntlrInputStream(new StringReader(text));
       var lexer = new MiniCLexer(inputStream);
@@ -33,7 +33,7 @@ namespace _module
       }
     }
     
-    public static void ParseFileSecTypes(ISequence<char> filename, out Dafny.IMap<Variable, SecType> decls, out Command ast) {
+    public static void ParseFileSecTypes(ISequence<char> filename, out Dafny.IMap<_IVariable, _ISecType> decls, out _ICommand ast) {
       string text = System.IO.File.ReadAllText(Dafny.Helpers.ToString(filename));
       var inputStream = new AntlrInputStream(new StringReader(text));
       var lexer = new MiniCLexer(inputStream);
@@ -72,7 +72,7 @@ namespace _module
         BigInteger result = new BigInteger();
         var b = BigInteger.TryParse(val, out result);
         if (b) {
-          return Tuple2<BigInteger, IO>.create(result, new IO());
+          return new Tuple2<BigInteger, IO>(result, new IO());
         }
         else {
           Console.WriteLine("Invalid integer!  Try again.");
@@ -87,7 +87,7 @@ namespace _module
         BigInteger result = new BigInteger();
         var b = BigInteger.TryParse(val, out result);
         if (b) {
-          return Tuple2<BigInteger, IO>.create(result, new IO());
+          return new Tuple2<BigInteger, IO>(result, new IO());
         }
         else {
           Console.WriteLine("Invalid integer!  Try again.");

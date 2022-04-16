@@ -137,25 +137,27 @@ lemma NIexamples() {
     assert ExprHasSecType(d, cond, Low);
     assert CommandHasSecType(d, ite, Low);
 
-    //Example: PrintS should be low only
+    // Example: PrintS should be Low only
     var printSCommand := PrintS("Hello");
     assert CommandHasSecType(d, printSCommand, Low);
     assert !CommandHasSecType(d, printSCommand, High);
 
-    // Example: printE should work only on low
+    // Example: PrintE should work only on Low
+    d := map[x := High, y:= Low];
     var printECommand2 := PrintE(Var(y));
     assert CommandHasSecType(d, printECommand2, Low);
     assert !CommandHasSecType(d, printECommand2, High);
 
-    //Example: Y is a low variable. Low should pass but High should fail
+    // Example: Y is a Low variable. Low should pass but High should fail
     var getIntCommand2 := GetInt(y);
     assert CommandHasSecType(d, getIntCommand2, Low);
     assert !CommandHasSecType(d, getIntCommand2, High);
 
-    //Example: X is High variable. High should pass. Low should fail
+    // Example: X is High variable. High should pass via the basic rules, 
+    // but Low should pass too, thanks to the CMD-LWR rule 
     var getSecretIntCommand1 := GetSecretInt(x);
-    assert !CommandHasSecType(d, getSecretIntCommand1, Low);
     assert CommandHasSecType(d, getSecretIntCommand1, High);
+    assert CommandHasSecType(d, getSecretIntCommand1, Low);
 }
 
 //////////////////////////////////////////////////////////////////
