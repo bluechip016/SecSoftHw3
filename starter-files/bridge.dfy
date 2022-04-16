@@ -17,7 +17,7 @@ module Bridge {
 
 	predicate method Valid(s:state) {
 		// WRITE a specification here based on the problem definition in the handout
-		if(   (s.LightA==Green && s.LightB==Green) ||   ( s.W_A < 0  )   || (s.W_B < 0)  || ( s.Cross_Counter < 0)  )then false else true
+		if((s.LightA==Green && s.LightB==Green) || ( s.W_A < 0) || (s.W_B < 0) || ( s.Cross_Counter < 0) )then false else true
 
 	}
 
@@ -71,10 +71,10 @@ module Bridge {
 	
 	method Cross(s:state) returns (s':state)
     requires Valid(s)
-	requires  (  (  (s.W_A>0 ) &&(s.W_B>0) ) ||  (  (s.W_B==0)&&(s.LightA==Green)&&(s.W_A>0) ) || (    (s.W_A==0)&&(s.LightA!=Green)&&(s.W_B>0)      )  ) 
-	//requires  (s.LightB==Green)&&(s.W_B > 0)     
+	requires  (((s.W_A>0 ) &&(s.W_B>0)) || ((s.W_B==0)&&(s.LightA==Green)&&(s.W_A>0)) || ((s.W_A==0)&&(s.LightA!=Green)&&(s.W_B>0))) 
+	//requires  (s.LightB==Green)&&(s.W_B > 0) 
     ensures Valid(s')
-	ensures (s'.W_A>=0 &&s'.W_B>=0)
+	ensures (s'.W_A>=0 &&s'.W_B>=0 && (s'.W_A==s.W_A-1 || s'.W_B==s.W_B-1) && s'.Cross_Counter==s.Cross_Counter+1)
 	{
 		s' := s;
 		if s.LightA.Green? {
@@ -89,10 +89,10 @@ module Bridge {
 	method Switch_Lights(s:state) returns (s':state)
     requires Valid(s)
 	requires(s.W_A >= 0 && s.W_B >=0)
-	requires (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
+	requires (((s.LightA==Red)&&(s.LightB==Green)) || ((s.LightA==Green)&&(s.LightB==Red)))
     ensures Valid(s')
-	ensures  (         (   (s.LightA==Red)&&(s.LightB==Green)    ) ||(          (s.LightA==Green)&&(s.LightB==Red)         )                   )
-	ensures( s'.W_A==s.W_A && s'.W_B==s.W_B)
+	ensures  (((s.LightA==Red)&&(s.LightB==Green)) || ((s.LightA==Green)&&(s.LightB==Red)))
+	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B)
 	{
 		s' := s;
 		if s'.LightA.Red? {
@@ -125,8 +125,6 @@ module Bridge {
 			case Both => s' := Increment_W_A(s'); s' := Increment_W_B(s');
 			case Neither => s' := s';
 		}
-		
-		
 
 		if ((s'.W_A == 0) || (s'.W_B == 0)) && !(s'.W_A == 0 && s'.W_B == 0) {
 			// Simple case
