@@ -17,7 +17,7 @@ module Bridge {
 
 	predicate method Valid(s:state) {
 		// WRITE a specification here based on the problem definition in the handout
-		if((s.LightA==Green && s.LightB==Green) || ( s.W_A < 0) || (s.W_B < 0) || ( s.Cross_Counter < 0) )then false else true
+		if((s.LightA==Green && s.LightB==Green) || ( s.W_A < 0) || (s.W_B < 0) || ( s.Cross_Counter < 0)  ||(s.Cross_Counter>5)      )then false else true
 
 	}
 
@@ -35,12 +35,15 @@ module Bridge {
 	method Increment_W_A(s:state) returns (s':state)
     requires Valid(s)
 	requires(s.W_A>=0 && s.W_B>=0 && s.Cross_Counter>=0)
+	//requires !(s.Cross_Counter >5&&s.LightA==Red&&s.W_A==0)
+	//requires !(s.Cross_Counter >5&&s.LightB==Green&&s.W_A==0)
     ensures Valid(s')
 	ensures (s'.W_A==s.W_A+1)
 	ensures s'.W_A>0
 	ensures (s'.W_B==s.W_B)
 	ensures s'.Cross_Counter==s.Cross_Counter
 	ensures s'.LightA==s.LightA && s'.LightB==s.LightB
+	//ensures !(s.Cross_Counter >5&&s.LightA==Red&&s.W_A==0)
 	{
 		s' := s.(W_A := s.W_A + 1);
 	}
@@ -48,12 +51,15 @@ module Bridge {
 	method Increment_W_B(s:state) returns (s':state)
     requires Valid(s)
 	requires(s.W_A>=0 && s.W_B>=0 && s.Cross_Counter>=0)
+	//requires !(s.Cross_Counter >5&&s.LightA==Green&&s.W_B==0)
+	//requires !(s.Cross_Counter >5&&s.LightB==Red&&s.W_B==0)
     ensures Valid(s')
 	ensures (s'.W_A==s.W_A)
 	ensures (s'.W_B==s.W_B+1)
 	ensures s'.W_B>0
 	ensures s'.Cross_Counter==s.Cross_Counter
 	ensures s'.LightA==s.LightA && s'.LightB==s.LightB
+	//ensures !(s.Cross_Counter >5&&s.LightB==Red&&s.W_B==0)
 	{
 		s' := s.(W_B := s.W_B + 1);
 	}
@@ -61,10 +67,14 @@ module Bridge {
 	method Increment_Cross_Counter(s:state) returns (s':state)
     requires Valid(s)
 	requires(s.W_A>=0 && s.W_B>=0)
+	requires s.Cross_Counter < 5
+	//requires !(s.Cross_Counter==5 && ((s.LightA==Red&&s.W_A>0) || (s.LightB==Red&&s.W_B>0)))
     ensures Valid(s')
 	ensures(s'.W_A==s.W_A && s'.W_B==s.W_B && s'.Cross_Counter==s.Cross_Counter+1)
 	ensures(s'.LightA==s.LightA)
 	ensures s'.LightB==s.LightB
+	ensures s'.Cross_Counter<=5
+	//requires !(s.Cross_Counter==5 && ((s.LightA==Red&&s.W_A>0) || (s.LightB==Red&&s.W_B>0)))
 	{
 		s' := s.(Cross_Counter := s.Cross_Counter + 1);
 	}
@@ -82,10 +92,13 @@ module Bridge {
 	
 	method Cross(s:state) returns (s':state)
     requires Valid(s)
+	requires s.Cross_Counter < 5
 	requires  (((s.W_A>0 ) &&(s.W_B>0)) || ((s.W_B==0)&&(s.LightA==Green)&&(s.W_A>0)) || ((s.W_A==0)&&(s.LightA!=Green)&&(s.W_B>0))) 
 	//requires  (s.LightB==Green)&&(s.W_B > 0) 
     ensures Valid(s')
+	ensures s'.Cross_Counter<=5
 	ensures (s'.W_A>=0 &&s'.W_B>=0)
+	ensures s'.LightA==s.LightA &&s'.LightB==s.LightB
 	ensures s'.Cross_Counter==s.Cross_Counter+1
 	ensures (s'.LightA==Green && s'.W_A==s.W_A-1 && s'.W_B==s.W_B &&s'.LightB==Red) || (s'.LightA==Red && s'.W_A==s.W_A && s'.W_B==s.W_B-1 )
 	{
@@ -123,6 +136,11 @@ module Bridge {
 	
 	method Tick(next:Next_Car, s:state) returns (s':state)
 		requires Valid(s)
+		requires(s.Cross_Counter <5 ) || (s.Cross_Counter==5 && s.LightB!=s.LightA)
+		requires (s.LightA!=s.LightB) || (s.LightA==s.LightB &&  (s.W_A>0 || s.W_B>0)) || (s.W_A==0&&s.W_B==0&&s.Cross_Counter==0)
+		//requires(s.LightA!=s.LightB) || (s.LightB==s.LightA && s.Cross_Counter==0)
+		//requires !(   (s.Cross_Counter >5&&s.LightB==Red&&s.W_B>0) ||  (s.Cross_Counter >5&&s.LightA==Red&&s.W_A>0) )
+		//ensures !(   (s'.Cross_Counter >5&&s'.LightB==Red&&s'.W_B>0&&s'.W_A>0) ||  (s'.Cross_Counter >5&&s'.LightA==Red&&s'.W_A>0) )
 		//requires (s.LightA!=Green || s.LightB!=Green)
 		//requires (  s.W_B>=0 && s.W_A>=0   )
 		//requires (s.LightA!=Green)
@@ -130,6 +148,13 @@ module Bridge {
 		//requires (    s.W_B>0     ) ||    (   (s.W_B==0 )   &&(   (next==B) ||   (s.W_A>0) ||   (next==Both) ||    (next==A)       ) )
 		//requires (    s.W_A>0     ) ||    (   (s.W_A==0 )   &&(   (next==A) || (next==Both) || (s.W_B>0) || (next==B)  ) )
 		ensures Valid(s')
+		ensures (s'.Cross_Counter <5 ) ||(s'.LightA!=s'.LightB &&s'.Cross_Counter==5)
+		ensures (s'.LightB!=s'.LightA) || (s'.LightA==s'.LightB&& s'.W_A==0==s.W_A && s'.W_B==0==s.W_B&&s'.Cross_Counter==0==s.Cross_Counter)
+		//ensures (s'.Cross_Counter==1 && s'.LightA==Green && s'.LightB==Red ) ||
+		//(s'.Cross_Counter==1 && s'.LightB==Green && s'.LightA==Red) ||
+		//(s'.Cross_Counter==s.Cross_Counter+1 &&s'.LightA==Green &&s'.LightB==Red) ||
+		//(s'.Cross_Counter<=5 && s'.Cross_Counter==s.Cross_Counter+1 && s'.LightA==s.LightA && s'.LightB==s.LightB) ||
+		//(s'.Cross_Counter==1&&s'.LightA==s.LightB&&s'.LightB==s.LightA)
 	{
 		s' := s;
 		
