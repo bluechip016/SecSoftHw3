@@ -210,7 +210,18 @@ function method EvalCommand(s:State, c:Command) : CResult
 
         case IfThenElse(cond, ifTrue, ifFalse) => // if cond then { ifTrue } else { ifFalse }
             // TODO: Update this clause to have the correct semantics
-            Success(s.store, s.io)
+            var value:=EvalExpr(cond,s.store);
+            (match value
+                case EFail => Fail
+                case ESuccess(I(_)) => Fail
+                case ESuccess(B(b)) => 
+                    if b then 
+                        EvalCommand(State(s.fuel, s.store, s.io), ifTrue)
+                    else
+                        EvalCommand(State(s.fuel, s.store, s.io), ifFalse)
+
+            )
+            //Success(s.store, s.io)
 
         case While(cond, body) =>
             // First evaluate the conditional expression
@@ -228,11 +239,29 @@ function method EvalCommand(s:State, c:Command) : CResult
 
         case PrintS(str) => 
             // TODO: Update this clause to have the correct semantics
-            Success(s.store, s.io)
+            var io':=PrintString(str,s.io.(output:=[]));
+            Success(s.store,io'.(output := s.io.output +[str]))
+           // Success(s.store, s.io)
 
         case PrintE(e) =>
-            // TODO: Update this clause to have the correct semantics
-            Success(s.store, s.io)
+          // TODO: Update this clause to have the correct semantics
+            var value:=EvalExpr(e,s.store);
+            (
+                match value
+                case EFail => Fail
+                case ESuccess(I(i)) =>
+                     var str:= Int2String(i);
+                     var io':=PrintString(str,s.io.(output:=[]));
+                    Success(s.store,io'.(output := s.io.output +[str]))
+                case ESuccess(B(b)) => 
+                    var str:= Bool2String(b);
+                    var io':=PrintString(str,s.io.(output:=[]));
+                    Success(s.store,io'.(output := s.io.output +[str]))
+
+            )
+            //Success(s.store, io'.(output := s.io.output))
+          
+            //Success(s.store, s.io)
 
         case GetInt(variable) =>    // variable := GetInt()
             // Get an integer from the outside world, which gives us an updated IO record
@@ -243,7 +272,8 @@ function method EvalCommand(s:State, c:Command) : CResult
 
         case GetSecretInt(variable) =>    // variable := GetSecretInt()
             // TODO: Update this clause to have the correct semantics
-            Success(s.store, s.io)
+            var (i, io') := ReadSecretInt(s.io.(in_secret := []));
+            Success(s.store[variable := I(i)], io'.(in_secret := s.io.in_secret+[i]))
 }
 
 
@@ -310,6 +340,10 @@ predicate method ExprHasType(d:Declarations, e:Expr, t:Type) {
         case BinaryOp(op, lhs, rhs) =>
             // TODO: Update this clause to perform the correct checks
             true
+            //var lhs:=ExprHasType(lhs,d);
+            //var rhs:=ExprHasType(rhs,d);
+            //if lhs.false?||rhs.false? then
+              //  false
 }
 
 // Define what it means for a command to be well typed
