@@ -379,8 +379,8 @@ predicate method CommandWellTyped(d:Declarations, c:Command) {
 
         case PrintS(str) => 
             // TODO: Update this clause to perform the correct checks
-            //true
-            false
+            true
+            //false
 
         case PrintE(e) => 
              //ExprHasType(d,e,)
