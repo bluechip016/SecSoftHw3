@@ -339,11 +339,10 @@ predicate method ExprHasType(d:Declarations, e:Expr, t:Type) {
 
         case BinaryOp(op, lhs, rhs) =>
             // TODO: Update this clause to perform the correct checks
-            true
-            //var lhs:=ExprHasType(lhs,d);
-            //var rhs:=ExprHasType(rhs,d);
-            //if lhs.false?||rhs.false? then
-              //  false
+            //true
+            var lhs:=ExprHasType(d,lhs,t);
+            var rhs:=ExprHasType(d,rhs,t);
+            if lhs&&rhs==true then true else false
 }
 
 // Define what it means for a command to be well typed
@@ -368,8 +367,11 @@ predicate method CommandWellTyped(d:Declarations, c:Command) {
             CommandWellTyped(d, c0) && CommandWellTyped(d, c1)
 
         case IfThenElse(cond, ifTrue, ifFalse) =>
+            ExprHasType(d,cond,TBool) &&
+            CommandWellTyped(d,ifTrue) &&
+            CommandWellTyped(d,ifFalse)
             // TODO: Update this clause to perform the correct checks
-            true
+            //true
 
         case While(cond, body) =>
             // We only allow Boolean conditionals, and the body must be well typed
@@ -377,19 +379,21 @@ predicate method CommandWellTyped(d:Declarations, c:Command) {
 
         case PrintS(str) => 
             // TODO: Update this clause to perform the correct checks
-            true
+            //true
+            false
 
         case PrintE(e) => 
+             //ExprHasType(d,e,)
             // TODO: Update this clause to perform the correct checks
-            true
+            ExprHasType(d,e,TBool)||ExprHasType(d,e,TInt)
 
         case GetInt(variable) => 
+            if variable in d then true else false
             // TODO: Update this clause to perform the correct checks
-            true
 
         case GetSecretInt(variable) =>
             // TODO: Update this clause to perform the correct checks
-            true
+            if variable in d then true else false
 }
 
 lemma TypeExamples(io:IO) {
