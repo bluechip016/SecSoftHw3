@@ -39,8 +39,18 @@ predicate method ExprHasSecType(d:SecDeclarations, e:Expr, t:SecType) {
                 // This variable wasn't declared with a type!
                 false  
         case BinaryOp(op, left, right) =>
+            //var leftt:=ExprHasSecType(d,left,t);
+            //var rightt:=ExprHasSecType(d,right,t);
+            //if lhs&&rhs==true then true else false
+           // match op
+                //case Plus => leftt&&rightt
+                //case Sub => leftt&&rightt
+                //case Times => leftt&&rightt
+                //case Leq => leftt&&rightt
+                //case Eq => leftt&&rightt
+            ExprHasSecType(d,left,t)&&ExprHasSecType(d,right,t)
             // TODO: Fill in this case
-            true
+           //true
     //####CodeMarker1End####
 }
 
@@ -67,27 +77,33 @@ predicate method CommandHasSecTypeBasic(d:SecDeclarations, c:Command, t:SecType)
             CommandHasSecType(d, c0, t) && CommandHasSecType(d, c1, t)
 
         case IfThenElse(cond, ifTrue, ifFalse) =>
+            ExprHasSecType(d, cond, t) && CommandHasSecType(d, ifTrue, t) &&
+            CommandHasSecType(d, ifFalse, t)
             // TODO: Update this clause to perform the correct checks
-            true
+           // true
 
         case While(cond, body) =>
             ExprHasSecType(d, cond, t) && CommandHasSecType(d, body, t)
 
         case PrintS(str) =>
             // TODO: Update this clause to perform the correct checks
-            true
+            //true
+            if t==Low then true else false
 
         case PrintE(e) =>
+            ExprHasSecType(d, e, Low)  && t==Low
             // TODO: Update this clause to perform the correct checks
-            true
+            //true
 
         case GetInt(variable) =>
+            ExprHasSecType(d, Var(variable), Low)  && t==Low
             // TODO: Update this clause to perform the correct checks
-            true
+            //true
 
         case GetSecretInt(variable) =>
+            ExprHasSecType(d, Var(variable), High)  && t==High
             // TODO: Update this clause to perform the correct checks
-            true
+            //true
     //####CodeMarker2End####
 }
 
@@ -238,6 +254,11 @@ lemma HighCommandPreservesLowVars(d:SecDeclarations, c:Command, s:State, store':
             // Apply the induction hypothesis to the second command
             HighCommandPreservesLowVars(d, c1, State(s.fuel, result.s, result.io), store');
         case IfThenElse(cond, ifTrue, ifFalse) => 
+             var b := EvalExpr(cond, s.store).v.b;
+                if b {
+                    HighCommandPreservesLowVars(d, ifTrue, s, store');}
+                else{
+                    HighCommandPreservesLowVars(d, ifFalse, s, store');}
             // TODO: Update this case, so the proof goes through
         case While(cond, body) =>
             var b := EvalExpr(cond, s.store).v.b;
@@ -277,6 +298,11 @@ lemma HighCommandPreservesPubIO(d:SecDeclarations, c:Command, s:State, r:CResult
             HighCommandPreservesPubIO(d, c1, State(s.fuel, result.s, result.io), r);
         case IfThenElse(cond, ifTrue, ifFalse) => 
             // TODO: Update this case, so the proof goes through
+            var b := EvalExpr(cond, s.store).v.b;
+                if b {
+                    HighCommandPreservesPubIO(d, ifTrue, s, r);}
+                else{
+                    HighCommandPreservesPubIO(d, ifFalse, s, r);}
         case While(cond, body) =>
             var b := EvalExpr(cond, s.store).v.b;
             if b {
@@ -327,7 +353,8 @@ lemma NonInterferenceTypesInternal(d:SecDeclarations, c:Command, t:SecType, s0:S
     //####CodeMarker6Begin####
     match c {
         case Noop => // Automatic
-        case Assign(variable, e) =>           
+        case Assign(variable, e) => 
+            
             // TODO: Update this case, so the proof goes through
         case Concat(c0, c1) =>
             var result0 := EvalCommand(s0, c0);

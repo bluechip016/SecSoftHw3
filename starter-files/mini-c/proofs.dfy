@@ -45,6 +45,9 @@ lemma WellTypedCommandSuccess(d:Declarations, s:State, c:Command)
 
             case IfThenElse(cond, ifTrue, ifFalse) => 
                 // TODO: Update this case, so the proof goes through
+                WellTypedExprSuccess(d, s.store, cond, TBool); 
+                WellTypedCommandSuccess(d, s, ifTrue);
+                WellTypedCommandSuccess(d, s, ifFalse);
 
             case While(cond, body) => 
                 WellTypedExprSuccess(d, s.store, cond, TBool); 
@@ -54,7 +57,20 @@ lemma WellTypedCommandSuccess(d:Declarations, s:State, c:Command)
                 // TODO: Update this case, so the proof goes through
 
             case PrintE(e) =>  
+                //WellTypedExprSuccess(d, s.store, e, TBool); 
                 // TODO: Update this case, so the proof goes through
+                {match e
+                    case Bool(_) =>  WellTypedExprSuccess(d, s.store, e, TBool);
+                    case Int(_) => WellTypedExprSuccess(d, s.store, e, TInt);
+                    case Var(v) =>
+                    case BinaryOp(op, lhs, rhs) => 
+                        WellTypedExprSuccess(d, s.store, lhs, TInt);
+                        WellTypedExprSuccess(d, s.store, rhs, TInt);
+
+                }
+                    //WellTypedExprSuccess(d, s.store, e, TBool);
+                //var value:= WellTypedExprSuccess(d, s.store, e, TBool)|| WellTypedExprSuccess(d, s.store, e, TInt);
+                
 
             case GetInt(variable) =>  // Dafny automatically proves this case
 

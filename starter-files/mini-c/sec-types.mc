@@ -1,7 +1,7 @@
 
 decl
-  a:int, ; b:int, ; c:int, ; d:int, ;
-  x:int, ; y:int, ; z:int, ;
+  a:int,High ; b:int,High ; c:int,Low ; d:int,Low ;
+  x:int,High ; y:int,Low ; z:int,Low ;
 begin
   a := get_secret_int();
   b := get_secret_int();
