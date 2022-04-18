@@ -354,8 +354,24 @@ lemma NonInterferenceTypesInternal(d:SecDeclarations, c:Command, t:SecType, s0:S
     match c {
         case Noop => // Automatic
         case Assign(variable, e) => 
-            
-            // TODO: Update this case, so the proof goes through
+        // TODO: Update this case, so the proof goes through
+             if t.Low? {
+                if CommandHasSecTypeBasic(d, c, t) {
+                    NonInterfenceTypeExpr(d, s0.store, s1.store,e, t);
+                } else {
+                    assert CommandHasSecTypeBasic(d, c, High);
+                    HighCommandPreservesLowVars(d, c, s0, r0.s);
+                    HighCommandPreservesLowVars(d, c, s1, r1.s);   
+                    HighCommandPreservesPubIO(d, c, s0, r0);
+                    HighCommandPreservesPubIO(d, c, s1, r1); 
+                }
+            } else {
+                HighCommandPreservesLowVars(d, c, s0, r0.s);
+                HighCommandPreservesLowVars(d, c, s1, r1.s);
+                HighCommandPreservesPubIO(d, c, s0, r0);
+                HighCommandPreservesPubIO(d, c, s1, r1);
+            }
+
         case Concat(c0, c1) =>
             var result0 := EvalCommand(s0, c0);
             var result1 := EvalCommand(s1, c0);
@@ -418,6 +434,22 @@ lemma NonInterferenceTypesInternal(d:SecDeclarations, c:Command, t:SecType, s0:S
         case PrintS(str) => // Automatic 
         case PrintE(e) =>
             // TODO: Update this case, so the proof goes through
+            if t.Low? {
+                if CommandHasSecTypeBasic(d, c, t) {
+                    NonInterfenceTypeExpr(d, s0.store, s1.store, e, t);
+                } else {
+                    assert CommandHasSecTypeBasic(d, c, High);
+                    HighCommandPreservesLowVars(d, c, s0, r0.s);
+                    HighCommandPreservesLowVars(d, c, s1, r1.s);   
+                    HighCommandPreservesPubIO(d, c, s0, r0);
+                    HighCommandPreservesPubIO(d, c, s1, r1); 
+                }
+            } else {
+                HighCommandPreservesLowVars(d, c, s0, r0.s);
+                HighCommandPreservesLowVars(d, c, s1, r1.s);
+                HighCommandPreservesPubIO(d, c, s0, r0);
+                HighCommandPreservesPubIO(d, c, s1, r1);
+            }
         case GetInt(variable) => // Automatic
         case GetSecretInt(variable) => // Automatic 
     }
