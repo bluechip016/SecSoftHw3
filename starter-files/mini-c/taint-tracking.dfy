@@ -497,32 +497,31 @@ lemma NonInterferenceInternal(d:Declarations,
 
             if !taint0 {
                 // TODO: Fill this case in properly
-                var result00 := EvalCommandTaint(d, s0, ifFalse);
-                var result01 := EvalCommandTaint(d, s1, ifFalse);
-                var result10 := EvalCommandTaint(d, s0, ifTrue);
-                var result11 := EvalCommandTaint(d, s1, ifTrue);
-                 assert b0 == b1; 
-                 if !b0{
-                    NonInterferenceInternal(d, s0, s1, ifFalse, result00, result01);}
+                var result10 := EvalCommandTaint(d, new_s0, ifTrue);
+                var result00 := EvalCommandTaint(d, new_s0, ifFalse);
+                var result11 := EvalCommandTaint(d, new_s1, ifTrue);
+                var result01 := EvalCommandTaint(d, new_s1, ifFalse);
+                assert b0 == b1;
+                if !b0{
+                    NonInterferenceInternal(d, new_s0, s1, ifFalse, result00, result01);}
                 else{
-                    NonInterferenceInternal(d, s0, s1, ifTrue, result10, result11);}
+                    NonInterferenceInternal(d, new_s0, s1, ifTrue, result10, result11);}
             } else {
-                /*
-                var result00 := EvalCommandTaint(d, s0, ifFalse);
-                var result01 := EvalCommandTaint(d, s1, ifFalse);
-                var result10 := EvalCommandTaint(d, s0, ifTrue);
-                var result11 := EvalCommandTaint(d, s1, ifTrue);
+                var result10 := EvalCommandTaint(d, new_s0, ifTrue);
+                var result00 := EvalCommandTaint(d, new_s0, ifFalse);
+                var result11 := EvalCommandTaint(d, new_s1, ifTrue);
+                var result01 := EvalCommandTaint(d, new_s1, ifFalse);
                 if b0{
-                    TaintedPcPreservesLowVarsPubIO(d, s0, ifTrue, result10);
+                    TaintedPcPreservesLowVarsPubIO(d, new_s0, ifTrue, result10);
                 }else{
-                    TaintedPcPreservesLowVarsPubIO(d, s0, ifFalse, result01);
+                    TaintedPcPreservesLowVarsPubIO(d, new_s0, ifFalse, result00);
                 }
                 if b1{
-                    TaintedPcPreservesLowVarsPubIO(d, s1, ifTrue, result11);
+                    TaintedPcPreservesLowVarsPubIO(d, new_s1, ifTrue, result11);
                 }else{
-                    TaintedPcPreservesLowVarsPubIO(d, s1, ifFalse, result01);
+                    TaintedPcPreservesLowVarsPubIO(d, new_s1, ifFalse, result01);
                 }
-                */
+                
                 // TODO: Fill this case in properly
             }
         case While(cond, body) => 
