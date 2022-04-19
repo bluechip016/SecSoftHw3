@@ -350,6 +350,9 @@ lemma NonInterfenceExpr(d:Declarations, s0:TaintState, s1:TaintState, e:Expr, t:
         case Int(i)  => 
         case Var(v)  => 
         case BinaryOp(op, lhs, rhs) =>
+            NonInterfenceExpr(d,s0,s1,lhs,TInt);
+            NonInterfenceExpr(d,s0,s1,rhs,TInt);
+
         // TODO: Update this case, so the proof goes through 
     }
     //####CodeMarker3End####
@@ -393,7 +396,6 @@ lemma TaintedPcPreservesLowVarsPubIO(d:Declarations, s:TaintState, c:Command, r:
                 var result := EvalCommandTaint(d, s, ifFalse);
                 TaintedPcPreservesLowVarsPubIO(d, s, ifFalse, result);
             } else {
-                var s' := s.(fuel := s.fuel - 1);
                 var result := EvalCommandTaint(d, s, ifTrue);
                 TaintedPcPreservesLowVarsPubIO(d, s, ifTrue, result);
             }
