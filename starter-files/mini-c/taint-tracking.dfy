@@ -45,7 +45,7 @@ function method EvalExprTaint(d:Declarations, s:TaintState, e:Expr, t:Type) : (t
             // TODO: Fill this case in properly
            var lhs:=EvalExprTaint(d,s,lhs,TInt);
            var rhs:=EvalExprTaint(d,s,rhs,TInt);          
-           if (lhs.v.I? && rhs.v.I? && (  lhs.tainted==true   ||  rhs.tainted==true    )) then
+           if (  lhs.tainted==true   ||  rhs.tainted==true  ) then
                match op                    
                      case Plus  => TV(true,I(lhs.v.i +  rhs.v.i)) 
                     case Sub   => TV(true,I(lhs.v.i -  rhs.v.i)) 
@@ -168,7 +168,28 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
 
         case IfThenElse(cond, ifTrue, ifFalse) =>
             // TODO: Fill this case in properly
-            TSuccess(s)
+            //TSuccess(s)
+            var TV(taint, B(b)) := EvalExprTaint(d, s, cond, TBool);
+            if b then
+                var new_s := if taint then UpdatePCTaint(s, true) else s; 
+                var result := EvalCommandTaint(d, new_s, ifTrue);
+                (match result
+                    case TTimeout => TTimeout
+                    case TLeak => TLeak
+                    case TSuccess(s') =>    
+                        // Now that we've executed the loop, restore the PC's taint
+                        // to its previous value
+                        TSuccess(UpdatePCTaint(s', s.pc_tainted)))
+            else     
+                var new_s := if taint then UpdatePCTaint(s, true) else s; 
+                var result := EvalCommandTaint(d, new_s, ifFalse);
+                (match result
+                    case TTimeout => TTimeout
+                    case TLeak => TLeak
+                    case TSuccess(s') =>    
+                        // Now that we've executed the loop, restore the PC's taint
+                        // to its previous value
+                        TSuccess(UpdatePCTaint(s', s.pc_tainted)))
 
         case While(cond, body) =>
             // First evaluate the conditional expression
@@ -189,11 +210,33 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
 
         case PrintS(str) =>
             // TODO: Fill this case in properly
-            TSuccess(s)
+            //TSuccess(s)
+            if s.pc_tainted then
+                TLeak
+            else
+                var io':=PrintString(str,s.io);
+                TSuccess(s.(io:=io'))
 
-        case PrintE(e) =>
+        case PrintE(e) => 
             // TODO: Fill this case in properly
-            TSuccess(s)
+           /* if s.pc_tainted then
+                TLeak
+            else
+                var value:=EvalExpr(e,s.store);
+                (
+                match value
+                case EFail => TSuccess(s)
+                case ESuccess(I(i)) =>
+                     var str:= Int2String(i);
+                     var io':=PrintString(str,s.io);
+                    TSuccess(s.(io:=io'))
+                case ESuccess(B(b)) => 
+                    var str:= Bool2String(b);
+                    var io':=PrintString(str,s.io);
+                   TSuccess(s.(io:=io'))
+            )*/
+
+
                 
         case GetInt(variable) =>
             if s.pc_tainted then
