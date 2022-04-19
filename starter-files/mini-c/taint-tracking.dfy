@@ -219,7 +219,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
 
         case PrintE(e) => 
             // TODO: Fill this case in properly
-           /* if s.pc_tainted then
+            if s.pc_tainted then
                 TLeak
             else
                 var value:=EvalExpr(e,s.store);
@@ -234,7 +234,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
                     var str:= Bool2String(b);
                     var io':=PrintString(str,s.io);
                    TSuccess(s.(io:=io'))
-            )*/
+            )
 
 
                 
@@ -388,6 +388,15 @@ lemma TaintedPcPreservesLowVarsPubIO(d:Declarations, s:TaintState, c:Command, r:
 
         case IfThenElse(cond, ifTrue, ifFalse) =>
             // TODO: Fill this case in properly
+             var TV(taint, B(b)) := EvalExprTaint(d, s, cond, TBool);
+            if !b {
+                var result := EvalCommandTaint(d, s, ifFalse);
+                TaintedPcPreservesLowVarsPubIO(d, s, ifFalse, result);
+            } else {
+                var s' := s.(fuel := s.fuel - 1);
+                var result := EvalCommandTaint(d, s, ifTrue);
+                TaintedPcPreservesLowVarsPubIO(d, s, ifTrue, result);
+            }
 
         case While(cond, body) =>             
             var TV(taint, B(b)) := EvalExprTaint(d, s, cond, TBool);
@@ -486,7 +495,32 @@ lemma NonInterferenceInternal(d:Declarations,
 
             if !taint0 {
                 // TODO: Fill this case in properly
-            } else {                
+                var result00 := EvalCommandTaint(d, s0, ifFalse);
+                var result01 := EvalCommandTaint(d, s1, ifFalse);
+                var result10 := EvalCommandTaint(d, s0, ifTrue);
+                var result11 := EvalCommandTaint(d, s1, ifTrue);
+                 assert b0 == b1; 
+                 if !b0{
+                    NonInterferenceInternal(d, s0, s1, ifFalse, result00, result01);}
+                else{
+                    NonInterferenceInternal(d, s0, s1, ifTrue, result10, result11);}
+            } else {
+                /*
+                var result00 := EvalCommandTaint(d, s0, ifFalse);
+                var result01 := EvalCommandTaint(d, s1, ifFalse);
+                var result10 := EvalCommandTaint(d, s0, ifTrue);
+                var result11 := EvalCommandTaint(d, s1, ifTrue);
+                if b0{
+                    TaintedPcPreservesLowVarsPubIO(d, s0, ifTrue, result10);
+                }else{
+                    TaintedPcPreservesLowVarsPubIO(d, s0, ifFalse, result01);
+                }
+                if b1{
+                    TaintedPcPreservesLowVarsPubIO(d, s1, ifTrue, result11);
+                }else{
+                    TaintedPcPreservesLowVarsPubIO(d, s1, ifFalse, result01);
+                }
+                */
                 // TODO: Fill this case in properly
             }
         case While(cond, body) => 
