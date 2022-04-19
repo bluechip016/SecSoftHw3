@@ -272,8 +272,8 @@ function method EvalCommand(s:State, c:Command) : CResult
 
         case GetSecretInt(variable) =>    // variable := GetSecretInt()
             // TODO: Update this clause to have the correct semantics
-            var (i, io') := ReadSecretInt(s.io.(in_public := []));
-            Success(s.store[variable := I(i)], io'.(in_public := s.io.in_public))
+            var (i, io') := ReadSecretInt(s.io);
+            Success(s.store[variable := I(i)], io')
 }
 
 

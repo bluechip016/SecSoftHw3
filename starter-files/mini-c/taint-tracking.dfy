@@ -134,7 +134,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
     if s.fuel == 0 then TTimeout  // We ran too long
     else
     match c
-        case Noop =>  TSuccess(s)
+        case Noop => TSuccess(s)
 
         case Assign(variable, e) => 
             if !s.var_map[variable] && s.pc_tainted then
@@ -153,7 +153,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
                 var s' := UpdateVarVal(new_s, variable, value);
                 TSuccess(s')
 
-        case Concat(c0, c1) =>
+        case Concat(c0, c1) => 
             // First evaluate the left-hand side (c0)
             var result0 := EvalCommandTaint(d, s, c0);
             (match result0
@@ -167,6 +167,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
             )
 
         case IfThenElse(cond, ifTrue, ifFalse) =>
+        
             // TODO: Fill this case in properly
             //TSuccess(s)
             var TV(taint, B(b)) := EvalExprTaint(d, s, cond, TBool);
@@ -219,6 +220,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
 
         case PrintE(e) => 
             // TODO: Fill this case in properly
+            // assume false;
             if s.pc_tainted then
                 TLeak
             else
@@ -236,8 +238,6 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
                    TSuccess(s.(io:=io'))
             )
 
-
-                
         case GetInt(variable) =>
             if s.pc_tainted then
                 // We're in a tainted state, so we can't allow any interactions with the public world
@@ -565,6 +565,45 @@ lemma NonInterferenceInternal(d:Declarations,
             }
         case PrintS(str) => // automatic
         case PrintE(e) => 
+            var result0 := EvalCommandTaint(d, s0, PrintE(e));
+            var result1 := EvalCommandTaint(d, s1, PrintE(e));
+            assert result0.s.pc_tainted == result1.s.pc_tainted;
+            assert result0.s.io.in_public == result1.s.io.in_public;
+            assert result0.s.io.output == result1.s.io.output;
+            // var value:=EvalExpr(e,s0.store);
+            // (
+            //     match value
+            //     case EFail =>
+            //     case ESuccess(I(i)) =>
+            //         var TV(taint0, B(b0)) := EvalExprTaint(d, s0, cond, TBool);
+            //         var TV(taint1, B(b1)) := EvalExprTaint(d, s1, cond, TBool);
+
+            //         // If the conditional is tainted, then we must treat the PC as tainted
+            //         var new_s0 := s0; 
+            //         var new_s1 := s1;
+
+            //         var str:= Int2String(i);
+            //         var result0 := EvalCommandTaint(d, s0', PrintString(str,new_s0.io));
+            //         var result1 := EvalCommandTaint(d, s1', PrintString(str,new_s1.io));
+
+            //         NonInterfenceExpr(d, result0, result01, e, TInt);
+            //     case ESuccess(B(b)) =>
+            //     var TV(taint0, B(b0)) := EvalExprTaint(d, s0, cond, TBool);
+            //         var TV(taint1, B(b1)) := EvalExprTaint(d, s1, cond, TBool);
+            //         // If the conditional is tainted, then we must treat the PC as tainted
+            //         var new_s0 := s0; 
+            //         var new_s1 := s1;
+
+            //         var str:= Bool2String(b);
+            //         var io0':=PrintString(str,new_s0.io);
+            //         var io1':=PrintString(str,new_s1.io);
+
+            //         NonInterfenceExpr(d, new_s0.(io:=io0'), new_s1.(io:=io1'), e, TBool);
+            // )
+            // var TV(taint0, B(b0)) := EvalExprTaint(d, s0, e, TBool);
+            // Apply the inductive hypothesis to each sub-command
+            // NonInterfenceExpr(d, s0, s1, e, e);
+            
             // TODO: Fill this case in properly
 
         case GetInt(variable) => // automatic
