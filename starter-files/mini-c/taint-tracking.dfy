@@ -43,7 +43,22 @@ function method EvalExprTaint(d:Declarations, s:TaintState, e:Expr, t:Type) : (t
         case Var(v)  => TV(s.var_map[v], s.store[v])
         case BinaryOp(op, lhs, rhs) => 
             // TODO: Fill this case in properly
-            TV(true, B(false))
+           var lhs:=EvalExprTaint(d,s,lhs,TInt);
+           var rhs:=EvalExprTaint(d,s,rhs,TInt);          
+           if (lhs.v.I? && rhs.v.I? && (  lhs.tainted==true   ||  rhs.tainted==true    )) then
+               match op                    
+                     case Plus  => TV(true,I(lhs.v.i +  rhs.v.i)) 
+                    case Sub   => TV(true,I(lhs.v.i -  rhs.v.i)) 
+                    case Times => TV(true,I(lhs.v.i *  rhs.v.i)) 
+                    case Leq   => TV(true,B(lhs.v.i <=rhs.v.i))
+                    case Eq    => TV(true,B(lhs.v.i == rhs.v.i))
+           else
+               match op                    
+                    case Plus  => TV(false,I(lhs.v.i +  rhs.v.i)) 
+                    case Sub   => TV(false,I(lhs.v.i -  rhs.v.i)) 
+                    case Times => TV(false,I(lhs.v.i *  rhs.v.i)) 
+                    case Leq   => TV(false,B(lhs.v.i <= rhs.v.i))
+                    case Eq    => TV(false,B(lhs.v.i == rhs.v.i))
     //####CodeMarker1End####
 }
 
