@@ -230,28 +230,21 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
                 case EFail => TSuccess(s)
                 case ESuccess(I(i)) =>
                     var TV(taint, value) := EvalExprTaint(d, s, e, TInt);
-                    //var new_s := if taint then UpdatePCTaint(s, true) else s; 
-                   if taint then
-                       TLeak
-                    else
-                     var str:= Int2String(i);
-                     var io':=PrintString(str,s.io);
-                     var s':=s.(io:=io');
-                     //var io':=PrintString(str,new_s.io);
-                     //var s':=new_s.(io:=io');
-                     TSuccess(s')
-                     //TSuccess(UpdatePCTaint(s', s.pc_tainted))
+                    var str:= Int2String(i);
+                    var io':=PrintString(str,s.io);
+                    var s':=s.(io:=io');
+                    if taint then
+                        TLeak else
+                        TSuccess(s')
                 case ESuccess(B(b)) => 
                     var TV(taint, B(b)) := EvalExprTaint(d, s, e, TBool);
+                    //var new_s := if taint then UpdatePCTaint(s, true) else s; 
+                    var str:= Bool2String(b);
+                    var io':=PrintString(str,s.io);
+                    var s':=s.(io:=io');
                     if taint then
-                        TLeak
-                    else
-                        //var new_s := if taint then UpdatePCTaint(s, true) else s; 
-                        var str:= Bool2String(b);
-                        var io':=PrintString(str,s.io);
-                        var s':=s.(io:=io');
+                        TLeak else
                         TSuccess(s')
-                    // TSuccess(UpdatePCTaint(s', s.pc_tainted))
                 )
 
         case GetInt(variable) =>
@@ -580,16 +573,26 @@ lemma NonInterferenceInternal(d:Declarations,
             }
         case PrintS(str) => // automatic
         case PrintE(e) => 
-            var value:=EvalExpr(e,s0.store);
+            var s' := s1.store;
+            var value:=EvalExpr(e,s');
+            assert s0.io.output == s1.io.output;
            //var result := EvalCommandTaint(d, s0, PrintE(e));
             //var result1 := EvalCommandTaint(d, s1, PrintE(e));
             {match value
-                case EFail => 
+                case EFail => assert s0.io.output == s1.io.output;
                 case ESuccess(I(i)) =>
+                    // var str:= Int2String(i);
+                    // var io0':=PrintString(str,s0.io);
+                    // var io1':=PrintString(str,s1.io);
                     NonInterfenceExpr(d, s0, s1, e, TInt);
+                    assert s0.io.output == s1.io.output;
                 case ESuccess(B(b)) => 
-                    NonInterfenceExpr(d, s0, s1, e, TBool);}
-
+                    // var str:= Bool2String(b);
+                    // var io0':=PrintString(str,s0.io);
+                    // var io1':=PrintString(str,s1.io);
+                    NonInterfenceExpr(d, s0, s1, e, TBool);
+                    assert s0.io.output == s1.io.output;
+            }
             
             // TODO: Fill this case in properly
 
