@@ -11,7 +11,28 @@ at, and explain how the relevant security typing rules will enable a successful 
 can test your labels by actually running the security type checker on the program! You still need to
 explain why the type checking works, however.
 
-Ans: 
+Ans: The program cannot be type checked in our security type system. From part of :
+```c
+a := get_int();
+b := get_secret_int();
+c := get_secret_int();
+```
+We can know that `SecType` of a,b,c is `Low`,`High`, and `High`. 
+So, if `SecType` of z is `Low`, according to the code: 
+```c
+case Assign(variable, e) => 
+            if variable in d then 
+                d[variable] == t && ExprHasSecType(d, e, t)
+            else 
+                false
+```
+the part of `z := c;` and `z := b;` will cause `flase`, becase b and c have `SecType` of `High`.
+However, if `SecType` of z is `High`, according to the code: 
+```c
+case PrintE(e) =>
+            ExprHasSecType(d, e, Low)  && t==Low
+```
+the part of ` print_expr z;` will also cause `flase`, becase b and c have `SecType` of `High`.
 
 * Q. • If the program cannot be type checked in our security type system, explain why not (1-2 paragraphs),
 again, referring to the relevant typing rules.
