@@ -3,15 +3,11 @@
 TODO: Add your answers here!
 
 2.4 Static vs. Dynamic Non-Interference (15 points)
-
-* Q. (5 points) Without changing the code, is there any assignment of security labels to the variables (a, b, c, z)
+## Part 1:
+`Q:`(5 points) Without changing the code, is there any assignment of security labels to the variables (a, b, c, z)
 that will allow this program to securely type check?
-• If so, provide the necessary labels, state which label (i.e., Low or High) the program will type check
-at, and explain how the relevant security typing rules will enable a successful type check. Hint: You
-can test your labels by actually running the security type checker on the program! You still need to
-explain why the type checking works, however.
 
-Ans: The program cannot be type checked in our security type system. From part of :
+`Ans`: The program cannot be type checked in our security type system. From part of :
 ```c
 a := get_int();
 b := get_secret_int();
@@ -34,14 +30,13 @@ case PrintE(e) =>
 ```
 the part of ` print_expr z;` will also cause `flase`, becase b and c have `SecType` of `High`.
 
-* Q. • If the program cannot be type checked in our security type system, explain why not (1-2 paragraphs),
-again, referring to the relevant typing rules.
-(10 points) If you run this program through the current version of our taint checker, it will report a leak.
+## Part 2
+` Q:`  (10 points) If you run this program through the current version of our taint checker, it will report a leak.
 Improve the taint checker (hint: focus on EvalExprTaint) so that (a) this program and others like it run
 successfully, without reporting a leak, and (b) all of the proofs of non-interference still hold.
 Summarize, in 1-2 paragraphs, what you changed and why the proofs still hold.
 
-Ans: Problem in old taint-checker: If any high value is multiplied with zero and the result is assigned to low variable, it used to report a leak. However, anything multiplied with zero will always return zero, hence, nothing is ever leaked. Therefore, the taint-checker should not be reporting any leak in that case.
+`Ans:` Problem in old taint-checker: If any high value is multiplied with zero and the result is assigned to low variable, it used to report a leak. However, anything multiplied with zero will always return zero, hence, nothing is ever leaked. Therefore, the taint-checker should not be reporting any leak in that case.
 
 Fix: In the EvalExprTaint, we changed the taint value of Times op, in case either of the LHS or RHS operands were equal to ZERO constant. In that case, we simply return the taint as false. And the taint checker no longer reports a leak in that case.
 
