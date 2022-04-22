@@ -44,13 +44,13 @@ function method EvalExprTaint(d:Declarations, s:TaintState, e:Expr, t:Type) : (t
         case BinaryOp(op, lhs, rhs) => 
             // TODO: Fill this case in properly
            var lhs:=EvalExprTaint(d,s,lhs,TInt);
-           var rhs:=EvalExprTaint(d,s,rhs,TInt);          
-           if (  lhs.tainted==true   ||  rhs.tainted==true  ) then
-               match op                    
-                     case Plus  => TV(true,I(lhs.v.i +  rhs.v.i)) 
+           var rhs:=EvalExprTaint(d,s,rhs,TInt);        
+           if (lhs.tainted==true  ||  rhs.tainted==true) then
+               match op
+                    case Plus  => TV(true,I(lhs.v.i +  rhs.v.i)) 
                     case Sub   => TV(true,I(lhs.v.i -  rhs.v.i)) 
-                    case Times => TV(true,I(lhs.v.i *  rhs.v.i)) 
-                    case Leq   => TV(true,B(lhs.v.i <=rhs.v.i))
+                    case Times => if ((lhs.tainted==false && lhs.v==I(0)) || (rhs.tainted==false && rhs.v==I(0))) then TV(false, I(0)) else TV(true,I(lhs.v.i *  rhs.v.i))
+                    case Leq   => TV(true,B(lhs.v.i <= rhs.v.i))
                     case Eq    => TV(true,B(lhs.v.i == rhs.v.i))
            else
                match op                    
@@ -177,7 +177,7 @@ function method EvalCommandTaint(d:Declarations, s:TaintState, c:Command) : (t:T
                 (match result
                     case TTimeout => TTimeout
                     case TLeak => TLeak
-                    case TSuccess(s') =>    
+                    case TSuccess(s') =>
                         // Now that we've executed the loop, restore the PC's taint
                         // to its previous value
                         TSuccess(UpdatePCTaint(s', s.pc_tainted)))

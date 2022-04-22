@@ -4,6 +4,7 @@ SRC=bridge.dfy \
 		mini-c/def.dfy \
 		mini-c/proofs.dfy \
 		mini-c/security-types.dfy \
+		mini-c/static-vs-dynamic.mc \
 		mini-c/taint-tracking.dfy \
 		mini-c/type-leak.mc \
 		mini-c/type_leak_attack.py \

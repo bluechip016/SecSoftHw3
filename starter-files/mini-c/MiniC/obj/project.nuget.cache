@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "Rp1l5Hv0bzqyluXaa8w6eLLp3Pue/DLtSvYZ9HT9VFDmgcUWpJp/bwjvJqx4f0VzKsDNLqdq2ZkYUneC2gBZ9g==",
+  "success": true,
+  "projectFilePath": "/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/MiniC.csproj",
+  "expectedPackageFiles": [
+    "/Users/warmearthling/.nuget/packages/antlr4.runtime.standard/4.9.1/antlr4.runtime.standard.4.9.1.nupkg.sha512"
+  ],
+  "logs": []
+}

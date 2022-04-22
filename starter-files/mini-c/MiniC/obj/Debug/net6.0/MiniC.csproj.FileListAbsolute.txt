@@ -1,0 +1,17 @@
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/bin/Debug/net6.0/MiniC
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/bin/Debug/net6.0/MiniC.deps.json
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/bin/Debug/net6.0/MiniC.runtimeconfig.json
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/bin/Debug/net6.0/MiniC.dll
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/bin/Debug/net6.0/MiniC.pdb
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/bin/Debug/net6.0/Antlr4.Runtime.Standard.dll
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.csproj.AssemblyReference.cache
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.GeneratedMSBuildEditorConfig.editorconfig
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.AssemblyInfoInputs.cache
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.AssemblyInfo.cs
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.csproj.CoreCompileInputs.cache
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.csproj.CopyComplete
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.dll
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/refint/MiniC.dll
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.pdb
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/MiniC.genruntimeconfig.cache
+/Users/warmearthling/Desktop/SecSoftHw3/starter-files/mini-c/MiniC/obj/Debug/net6.0/ref/MiniC.dll
